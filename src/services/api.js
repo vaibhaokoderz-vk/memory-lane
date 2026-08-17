@@ -1,73 +1,91 @@
-import { friends as seedFriends, slamBook as seedSlamBook } from "../data/dummyData";
+import { dummyActivity, dummyFriends, dummySlamBook } from "../data/dummyData";
 
 /**
- * API layer. Currently backed by in-memory dummy data so the UI is always
- * populated. Swap `USE_DUMMY` to false (and set API_BASE) to talk to the
- * existing Spring Boot REST API — the function signatures stay identical.
+ * Central API layer.
+ *
+ * While the Spring Boot backend is not wired up, every call is served from
+ * centralized dummy data so the whole UI is populated. Set
+ * VITE_API_BASE_URL and VITE_USE_API=true to switch to the real REST API —
+ * the function signatures never change.
  */
-const USE_DUMMY = true;
-const API_BASE = "/api";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+const USE_API = import.meta.env.VITE_USE_API === "true" && Boolean(API_BASE);
 
-let friendsStore = [...seedFriends];
+let friendsStore = dummyFriends.map((f) => ({ ...f }));
+let slamBookStore = { ...dummySlamBook };
 
-const delay = (ms = 180) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function request(path, options) {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
-  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  if (!res.ok) throw new Error("REQUEST_FAILED");
   return res.status === 204 ? null : res.json();
 }
 
 export async function getSlamBook() {
-  if (!USE_DUMMY) return request("/slambook");
+  if (USE_API) return request("/api/slambook");
   await delay();
-  return seedSlamBook;
+  return { ...slamBookStore };
+}
+
+export async function updateSlamBook(data) {
+  if (USE_API)
+    return request("/api/slambook", { method: "PUT", body: JSON.stringify(data) });
+  await delay();
+  slamBookStore = { ...slamBookStore, ...data };
+  return { ...slamBookStore };
 }
 
 export async function getFriends() {
-  if (!USE_DUMMY) return request("/friends");
+  if (USE_API) return request("/api/friends");
   await delay();
-  return friendsStore;
+  return friendsStore.map((f) => ({ ...f }));
 }
 
 export async function getFriendById(id) {
-  if (!USE_DUMMY) return request(`/friends/${id}`);
+  if (USE_API) return request(`/api/friends/${id}`);
   await delay();
-  return friendsStore.find((f) => String(f.id) === String(id)) || null;
+  const found = friendsStore.find((f) => String(f.id) === String(id));
+  return found ? { ...found } : null;
 }
 
 export async function createFriend(friend) {
-  if (!USE_DUMMY)
-    return request("/friends", { method: "POST", body: JSON.stringify(friend) });
+  if (USE_API)
+    return request("/api/friends", { method: "POST", body: JSON.stringify(friend) });
   await delay();
   const created = {
-    id: String(Date.now()),
-    emoji: "🙂",
     favorite: false,
     quote: friend.message || "A new page in my slam book 💖",
-    addedOn: new Date().toISOString().slice(0, 10),
     ...friend,
+    id: Date.now(),
+    addedOn: new Date().toISOString().slice(0, 10),
   };
   friendsStore = [created, ...friendsStore];
-  return created;
+  return { ...created };
 }
 
 export async function updateFriend(id, friend) {
-  if (!USE_DUMMY)
-    return request(`/friends/${id}`, { method: "PUT", body: JSON.stringify(friend) });
+  if (USE_API)
+    return request(`/api/friends/${id}`, { method: "PUT", body: JSON.stringify(friend) });
   await delay();
   friendsStore = friendsStore.map((f) =>
     String(f.id) === String(id) ? { ...f, ...friend } : f,
   );
-  return friendsStore.find((f) => String(f.id) === String(id));
+  return { ...friendsStore.find((f) => String(f.id) === String(id)) };
 }
 
 export async function deleteFriend(id) {
-  if (!USE_DUMMY) return request(`/friends/${id}`, { method: "DELETE" });
+  if (USE_API) return request(`/api/friends/${id}`, { method: "DELETE" });
   await delay();
   friendsStore = friendsStore.filter((f) => String(f.id) !== String(id));
   return true;
+}
+
+export async function getActivity() {
+  if (USE_API) return request("/api/activity");
+  await delay(200);
+  return dummyActivity;
 }
