@@ -14,6 +14,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as SlamBookRouteImport } from './routes/slam-book'
 import { Route as FriendsIndexRouteImport } from './routes/friends/index'
 import { Route as FriendsIdRouteImport } from './routes/friends/$id'
+import { Route as FriendsNewRouteImport } from './routes/friends/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,12 +41,18 @@ const FriendsIdRoute = FriendsIdRouteImport.update({
   path: '/friends/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FriendsNewRoute = FriendsNewRouteImport.update({
+  id: '/friends/new',
+  path: '/friends/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/slam-book': typeof SlamBookRoute
   '/friends/$id': typeof FriendsIdRoute
+  '/friends/new': typeof FriendsNewRoute
   '/friends/': typeof FriendsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/slam-book': typeof SlamBookRoute
   '/friends/$id': typeof FriendsIdRoute
+  '/friends/new': typeof FriendsNewRoute
   '/friends': typeof FriendsIndexRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/slam-book': typeof SlamBookRoute
   '/friends/$id': typeof FriendsIdRoute
+  '/friends/new': typeof FriendsNewRoute
   '/friends/': typeof FriendsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/slam-book' | '/friends/$id' | '/friends/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/slam-book'
+    | '/friends/$id'
+    | '/friends/new'
+    | '/friends/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/slam-book' | '/friends/$id' | '/friends'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/slam-book'
+    | '/friends/$id'
+    | '/friends/new'
+    | '/friends'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/slam-book'
     | '/friends/$id'
+    | '/friends/new'
     | '/friends/'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   SlamBookRoute: typeof SlamBookRoute
   FriendsIdRoute: typeof FriendsIdRoute
+  FriendsNewRoute: typeof FriendsNewRoute
   FriendsIndexRoute: typeof FriendsIndexRoute
 }
 
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/friends/new': {
+      id: '/friends/new'
+      path: '/friends/new'
+      fullPath: '/friends/new'
+      preLoaderRoute: typeof FriendsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -130,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   SlamBookRoute: SlamBookRoute,
   FriendsIdRoute: FriendsIdRoute,
+  FriendsNewRoute: FriendsNewRoute,
   FriendsIndexRoute: FriendsIndexRoute,
 }
 export const routeTree = rootRouteImport
