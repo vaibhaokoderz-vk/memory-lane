@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+// @ts-expect-error - plain JavaScript component
+import Navbar from "../components/Navbar.jsx";
 
 function NotFoundComponent() {
   return (
