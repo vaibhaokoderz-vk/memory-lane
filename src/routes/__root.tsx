@@ -9,10 +9,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-// @ts-expect-error - plain JavaScript component
-import Navbar from "../components/Navbar.jsx";
 
 function NotFoundComponent() {
   return (
@@ -79,12 +78,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Digital Slam Book" },
-      { name: "description", content: "A beautiful digital slam book for your friendships." },
-      { property: "og:title", content: "Digital Slam Book" },
+      { title: "Digital Slam Book 📖" },
+      {
+        name: "description",
+        content: "Collect friends and write slam entries in a modern digital memory book.",
+      },
+      { property: "og:title", content: "Digital Slam Book 📖" },
       {
         property: "og:description",
-        content: "Keep your friends, memories and little notes in one warm place.",
+        content: "Collect friends and write slam entries in a modern digital memory book.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -98,16 +100,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Plus+Jakarta+Sans:wght@400..800&family=Caveat:wght@500..700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
-    scripts: [
-      {
-        children: `(function(){try{var t=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`,
-      },
-    ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -116,7 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
@@ -133,20 +131,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Navbar />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <footer
-        style={{
-          textAlign: "center",
-          padding: "24px 16px 40px",
-          color: "var(--color-text-secondary)",
-          fontSize: "0.9rem",
-        }}
-      >
-        Made with 💖 for the people we don&rsquo;t want to forget.
-      </footer>
+      <Toaster richColors position="top-center" />
+
     </QueryClientProvider>
   );
 }
-
